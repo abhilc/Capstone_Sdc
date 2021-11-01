@@ -4,6 +4,7 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 from scipy.spatial import KDTree
+import numpy as np
 
 import math
 
@@ -56,6 +57,8 @@ class WaypointUpdater(object):
     def publish_waypoints(self, closest_idx):
         lane = Lane()
         lane.header = self.base_waypoints.header
+        
+        # rospy.info("Closest index is %s",closest_idx)
         
         # The closest_idx is one waypoint ahead of the vehicle. We need all waypoints. Thus adding LOOKAHEAD_WPS for slicing
         lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
