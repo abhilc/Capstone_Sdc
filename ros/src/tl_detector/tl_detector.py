@@ -69,6 +69,7 @@ class TLDetector(object):
 
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
+        # rospy.logerr('type of waypoints is %s', type(self.waypoints))
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
             self.waypoint_tree = KDTree(self.waypoints_2d)
@@ -123,8 +124,9 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        #TODO implement
+        
         return self.waypoint_tree.query([x, y], 1)[1]
+        
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
