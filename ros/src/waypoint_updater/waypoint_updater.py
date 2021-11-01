@@ -25,19 +25,21 @@ class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        # rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        # rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-
-
-        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
         self.pose = None
         self.base_waypoints = None
         self.waypoints_2d = None
         self.waypoint_tree = None
+        
+        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        
+        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # rospy.spin()
         self.loop()
@@ -57,6 +59,7 @@ class WaypointUpdater(object):
         
         # The closest_idx is one waypoint ahead of the vehicle. We need all waypoints. Thus adding LOOKAHEAD_WPS for slicing
         lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
+        # lane.waypoints = self.base_waypoints.waypoints
         self.final_waypoints_pub.publish(lane)
         
     
@@ -91,7 +94,7 @@ class WaypointUpdater(object):
     def pose_cb(self, msg):
         # TODO: Implement
         self.pose = msg
-        pass
+        
 
     def waypoints_cb(self, waypoints):
         '''
@@ -99,7 +102,7 @@ class WaypointUpdater(object):
         2. Store spatial 2D coordinates from waypoints
         3. setup KDTree. This helps in quickly retrieving the waypoint in front of the vehicle in log(n) time
         '''
-        self.waypoints = waypoints
+        self.base_waypoints = waypoints
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
             self.waypoint_tree = KDTree(self.waypoints_2d)
